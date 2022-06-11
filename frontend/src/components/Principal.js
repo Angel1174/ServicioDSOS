@@ -5,9 +5,9 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { Component } from 'react';
 import { NavbarComponent } from './NavbarComponent';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import './Login.css';
 
-const url = "https://servicio-autenticacion.herokuapp.com/login/admin/";
 
 class Principal extends Component {
 
@@ -17,10 +17,11 @@ class Principal extends Component {
     modalInsertar2: false,//editar
     form: {
       id: '',
-      alias: '',
-      email: '',
+      nombre: '',
+      username: '',
+      email:'',
+      estado: '',
       password: '',
-      status: '',
       tipoModal: ''
     }
   }
@@ -44,7 +45,7 @@ class Principal extends Component {
   }
 
   peticionGet = () => {
-    axios.get(url).then(
+    axios.get("https://servicio-autenticacion.herokuapp.com/login/admin/").then(
       response => {
         this.setState({ data: response.data.data });
       }).catch(error => {
@@ -54,16 +55,19 @@ class Principal extends Component {
 
   peticionPost = async () => {
     delete this.state.form.id;
-    await axios.post(url, this.state.form).then(response => {
+    await axios.post("https://servicio-autenticacion.herokuapp.com/login/register", this.state.form).then(response => {
       this.modalInsertar();
+      window.alert('Usuario agregado correctamente');
       this.peticionGet();
     }).catch(error => {
       console.log(error.message);
     })
   }
   peticionPut = () => {
-    axios.put(url + this.state.form.id, this.state.form).then(response => {
+    axios.put("https://servicio-autenticacion.herokuapp.com/login/admin/" + this.state.form.id, this.state.form).then(response => {
+
       this.modalInsertar2();
+      window.alert('Usuario editado con éxito');
       this.peticionGet();
     })
   }
@@ -72,10 +76,11 @@ class Principal extends Component {
       tipoModal: 'actualizar',
       form: {
         id: usuario.id,
-        alias: usuario.alias,
-        email: usuario.email,
-        password: usuario.password,
-        status: usuario.status
+        nombre: usuario.nombre,
+        username: usuario.username,
+        email:usuario.email,
+        estado:usuario.estado,
+        password: usuario.password
       }
     })
   }
@@ -119,10 +124,11 @@ class Principal extends Component {
               <thead>
                 <tr>
                   <th scope="col">ID</th>
+                  <th scope="col">Nombre</th>
                   <th scope="col">Usuario</th>
                   <th scope="col">Correo</th>
-                  <th scope="col">Contraseña</th>
-                  <th scope="col">Status</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Contraseña</th>                 
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
@@ -131,10 +137,11 @@ class Principal extends Component {
                   return (
                     <tr className="bg-primary">
                       <td align="center">{usuario.id}</td>
-                      <td align="center">{usuario.alias}</td>
+                      <td align="center">{usuario.nombre}</td>
+                      <td align="center">{usuario.username}</td>
                       <td align="center">{usuario.email}</td>
+                      <td align="center">{usuario.estado}</td>
                       <td align="center">{usuario.password}</td>
-                      <td align="center">{usuario.status}</td>
                       <td>
                         <button type="button" className="btn btn-success" onClick={() => { this.seleccionarUsuario(usuario); this.modalInsertar2() }}><FontAwesomeIcon icon={faEdit}></FontAwesomeIcon></button>
                         &nbsp;&nbsp;&nbsp;
@@ -148,19 +155,21 @@ class Principal extends Component {
           </center>
           {
           }
-          <Modal isOpen={this.state.modalInsertar}>
+          <Modal className="mo" isOpen={this.state.modalInsertar}>
             <ModalHeader>
               Registro de Usuario
             </ModalHeader>
-            <ModalBody>
+            <ModalBody >
               <div className="form-group">
-                <input className="form-control" placeholder='Usuario' type="text" name="alias" id="alias" required onChange={this.handleChange} value={form.alias}/>
+                <input className="form-control" placeholder='Nombre' type="text" name="nombre" id="nombre" required onChange={this.handleChange} value={form.nombre}/>
+                <br />
+                <input className="form-control" placeholder='Usuario' type="text" name="username" id="alias" required onChange={this.handleChange} value={form.usuario}/>
                 <br />
                 <input className="form-control" placeholder='Correo' type="text" name="email" id="email" required onChange={this.handleChange} value={form.email} />
                 <br />
                 <input className="form-control" placeholder='Contraseña' type="password" name="password" required id="password" onChange={this.handleChange} value={form.password} />
                 <br />
-                <input className="form-control" placeholder='Status' type="status" name="status" id="status"  required onChange={this.handleChange} value={form.status} />
+                <input className="form-control" placeholder='Status' type="status" name="estado" id="status"  required onChange={this.handleChange} value={form.estado} />
               </div>
             </ModalBody>
 
@@ -179,13 +188,15 @@ class Principal extends Component {
             </ModalHeader>
             <ModalBody>
               <div className="form-group">
-                <input className="form-control" placeholder='Usuario' type="text" name="alias" id="alias" onChange={this.handleChange} value={form ? form.alias : ''} />
+                <input className="form-control" placeholder='Nombre' type="text" name="nombre" id="nombre" required onChange={this.handleChange} value={form ? form.nombre: ''}/>
+                <br />
+                <input className="form-control" placeholder='Usuario' type="text" name="username" id="alias" onChange={this.handleChange} value={form ? form.username : ''} />
                 <br />
                 <input className="form-control" placeholder='Correo' type="text" name="email" id="email" disabled onChange={this.handleChange} value={form ? form.email : ''} />
                 <br />
                 <input className="form-control" placeholder='Contraseña' type="password" name="password" id="password" disabled onChange={this.handleChange} value={form ? form.password : ''} />
                 <br />
-                <input className="form-control" placeholder='Status' type="status" name="status" id="status" onChange={this.handleChange} value={form.status} />
+                <input className="form-control" placeholder='Status' type="status" name="estado" id="status" onChange={this.handleChange} value={form.estado} />
                 
               </div>
             </ModalBody>
