@@ -2,17 +2,16 @@ import React from "react";
 import './Login.css';
 import user2 from './img/user2.png';
 import axios from "axios";
-import Cookies from 'universal-cookie';
-const url = "https://servicio-autenticacion.herokuapp.com/login/admin/";
-
-const cookies = new Cookies();
+import { NavbarComponent } from './NavbarComponent';
 class Login extends React.Component {
 
     state = {
         form: {
-            email: '',
-            password: ''
-        }
+            "usernameOrEmail": "",
+            "password": ""
+        },
+        error: false,
+        errorMSsg: ""
     }
 
     manejadorSubmit(e) {
@@ -26,33 +25,32 @@ class Login extends React.Component {
                 [e.target.name]: e.target.value
             }
         });
-        console.log(this.state.form);
+        //console.log(this.state.form);
     }
+    
     iniciarSesion = async () => {
-        await axios.get(url, { params: { email: this.state.form.email, password: this.state.form.password} })
+        axios.post("https://servicio-autenticacion.herokuapp.com/login/auth", this.state.form)
             .then(response => {
-                console.log(response.data.data);
-            })
-            /*.then(response => {
-                if (response.length > 0) {
-                    var respuesta = response[0];
-                    cookies.set('id', respuesta.id, { path: "/" });
-                    cookies.set('alias', respuesta.alias, { path: "/" });
-                    cookies.set('email', respuesta.email, { path: "/" });
-                    alert(`Bienvenido ${respuesta.alias}`);
-                    // window.location.href="./menu";
+                if (response.data.mesage === "Ok") {
+                    alert("Bienvenido ");
+                    window.location.href = "./usuarios";
                 } else {
-                    alert('El correo o la contraseña no son correctos');
-                    //window.location.href="./menu";
+                    this.setState({
+                        error: true,
+                        errorMSsg: "Credenciales incorrectas"
+                    })
                 }
-            })*/
-            .catch(error => {
-                console.log(error);
+            }).catch(error => {
+                this.setState({
+                    error: true,
+                    errorMSsg: "Credenciales incorrectas"
+                })
             })
     }
     render() {
         return (
             <div>
+                <NavbarComponent></NavbarComponent>
                 <div className="wrapper fadeInDown">
                     <div id="formContent">
                         <div className="fadeIn first">
@@ -63,12 +61,19 @@ class Login extends React.Component {
                             <br></br>
                         </div>
                         <form onClick={this.manejadorSubmit}>
-                            <input type="text" className="fadeIn second" name="email" placeholder="Correo" onChange={this.handleChange} />
+                            <input type="text" className="fadeIn second" name="usernameOrEmail" placeholder="Correo/Usuario" onChange={this.handleChange} />
                             <input type="password" className="fadeIn third" name="password" placeholder="Contraseña" onChange={this.handleChange} />
                             <br></br>
                             <br></br>
                             <input type="submit" className="fadeIn fourth" value="Iniciar sesión" onClick={() => this.iniciarSesion()} />
                         </form>
+                        {this.state.error === true &&
+                            <div className="alert alert-danger" role="alert">
+                                {this.state.errorMSsg}
+                            </div>
+                        }
+
+
                     </div>
                 </div>
             </div>
