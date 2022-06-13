@@ -4,15 +4,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Component } from 'react';
 import '../css/Login.css';
 
+
 class Recuperar extends Component {
 
     state = {
         data: [],
         form: {
             id: '',
+            nombre: '',
+            username: '',
             email: '',
+            estado: '',
             password: ''
-        }
+        },
+        error: false,
+        errorMSsg: ""
     }
 
     handleChange = async e => {
@@ -25,11 +31,9 @@ class Recuperar extends Component {
         });
         //console.log(this.state.form);
     }
-    peticionPut = () => {
-        axios.put("https://servicio-autenticacion.herokuapp.com/login/admin/" + this.state.form.id, this.state.form)
+    peticionPut = (id) => {
+        axios.put("https://servicio-autenticacion.herokuapp.com/login/admin/" +id, this.state.form)
             .then(response => {
-                window.alert('Contraseña actualizada con éxito');
-                window.location.href = "./";
             }).catch(error => {
                 this.setState({
                     error: true,
@@ -37,8 +41,14 @@ class Recuperar extends Component {
                 })
             })
     }
-
-
+    metodoDelete = (id) => {
+          this.peticionPut(id);
+          window.alert('Contraseña actualizada con éxito');
+          window.location.href = "./";
+      }
+      manejadorSubmit(e) {
+        e.preventDefault();
+    }
     render() {
         const { form } = this.state;
         return (
@@ -49,14 +59,20 @@ class Recuperar extends Component {
                             <br></br>
                             <br></br>
                         </div>
-                        <h4 className='h4'>Recuperar contraseña</h4>
+                        <h4 className='h4'>Actualización de datos</h4>
                         <br></br>
                         <form onClick={this.manejadorSubmit}>
-                            <input type="text" className="fadeIn second" name="email" placeholder="Correo" onChange={this.handleChange} value={form.email}/>
+                            
+                            <input type="text" className="fadeIn second" name="id" placeholder="ID de usuario" onChange={this.handleChange} value={form.id}/>
+                            <input type="text" className="fadeIn second" name="nombre" placeholder="Nombre" onChange={this.handleChange}  value={form.nombre}/>
+                            <input type="text" className="fadeIn second" name="username" placeholder="Nuevo Usuario"  onChange={this.handleChange} value={form.username}/>
+                            <input type="text" className="fadeIn second" name="email" placeholder="Nuevo correo" onChange={this.handleChange}  value={form.email}/>
                             <input type="password" className="fadeIn third" name="password" placeholder="Nueva contraseña" onChange={this.handleChange} value={form.password} />
+                            <input type="text" className="fadeIn second" name="estado" placeholder="Status" onChange={this.handleChange}  value={form.estado}/>
+                            
                             <br></br>
                             <br></br>
-                            <input type="submit" className="fadeIn fourth" value="Actualizar contraseña"  onClick={() => this.peticionPut()} />
+                            <input type="submit" className="fadeIn fourth" value="Actualizar datos"  onClick={() => this.metodoDelete(form.id)} />
                         </form>
                     </div>
                 </div>
